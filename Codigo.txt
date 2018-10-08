@@ -1,0 +1,359 @@
+program MEUDEUSDOCEU;
+ {$APPTYPE CONSOLE}
+type
+  Tcliente = record
+    codigo:integer;
+    nome:string[60];
+    endereço:string[40];
+    cidade:string[30];
+    uf:string[5];
+end;
+  Tproduto = record
+    codigo:integer;
+    descricao:string[40];
+    valorunit:real;
+end;
+  Tnota = record
+    codigo:integer;
+    codigocliente:integer;
+    valortotal:real;
+end;
+  Titens = record
+    codcliente:integer;
+    codnota:integer;
+    codproduto:integer;
+    quantidade:integer;
+    valor:real;
+end;
+
+procedure menu;forward;//IMPLEMENTANDO                     POSSIVEL SOMENTE O CADASTRO DE UM ITEM POR NOTA
+procedure cadastrarcliente;forward;//IMPLEMENTADO
+procedure Salvarcadastro(Cliente:tCliente);forward;//IMPLEMENTADO
+procedure Lercadastrados;forward;//IMPLEMENTADO
+procedure Escreverdados(Cliente:tcliente);forward;//IMPLEMENTADO
+procedure cadastrarproduto;forward;//IMPLEMENTADO
+procedure salvarprodutos(Produto:tproduto);forward;//IMPLEMENTADO
+procedure emitirnota;forward;//IMPLEMENTANDO...
+procedure buscarcadastro(codcliente:integer);forward;//IMPLEMENTADO
+procedure aviso;forward;//IMPLEMENTADO
+function  buscarproduto(itens:titens):boolean;forward;//IMPLEMENTADO
+procedure mostrarnota(itens:titens);forward;//IMPLEMENTADO
+procedure salvarcadastron(itens:titens);forward; //IMPLEMENTADO
+procedure consultarnota(codnota:integer);forward; //IMPLEMENTADO
+
+procedure aviso;
+begin
+  writeln('DADOS INVALIDOS');
+end;
+
+//menu
+procedure menu;
+var
+opc:byte;
+begin
+opc:=0;
+while opc<>5 do
+begin
+    repeat
+     writeln('1-Cadastro do cliente');
+     writeln('2-Cadastrar produto');
+     writeln('3-Emitir nota');
+     writeln('4-Consultar nota');
+     writeln('5-Fechar programa');
+     readln(opc);
+    until (opc>0) and (opc<6);
+    case opc of
+      1:cadastrarcliente;
+      2:cadastrarproduto;
+      3:emitirnota;
+      4:consultarnota(-1);
+      5:exit
+    end;
+end;
+end;
+
+//Cadsatro cliente(codigo, nome, endereco, cidade, UF
+procedure cadastrarcliente;
+var
+Cliente:tcliente;
+begin
+   writeln('Area de cadastro de cliente informe (Fim) para sair');
+   writeln('');
+repeat
+   Write('Informe o nome do cliente: ');
+   readln(cliente.nome);
+until(cliente.nome<>'');
+if (cliente.nome='fim')then
+  begin
+    exit;
+  end;
+repeat
+   Write('Informe endereco: ');
+   readln(cliente.endereço);
+until(cliente.endereço<>'') ;
+
+repeat
+   Write('Informe a cidade: ');
+   readln(cliente.cidade);
+until (cliente.cidade<>'') ;
+
+repeat
+   Write('Infome o UF: ');
+   readln(cliente.uf);
+until (cliente.uf<>'');
+   Salvarcadastro(Cliente);
+
+end;
+
+//SALVA CADASTRO NO ARQUIVO
+procedure Salvarcadastro( Cliente:tcliente);
+var
+arqcliente:file of tcliente;
+x:integer;
+begin
+     assignfile(arqcliente,'C:\Cadastrocliente\cadastros.txt');
+     {I-}
+     reset(arqcliente);
+     if IORESULT<>0 then
+      Rewrite(arqcliente);
+     {I+}
+     x:=filesize(arqcliente);
+     cliente.codigo:=x;
+     seek(arqcliente,x);
+     write(arqcliente,Cliente);
+     closefile(arqcliente);
+     Writeln('OS DADOS DO CLIENTE ',cliente.nome,' FORAM CADASTRADOS COM SUCESSO O CODIGO  É ',x);
+     cadastrarcliente;
+end;
+
+//LE CADASTROS DO ARQUIVO
+procedure Lercadastrados;
+var
+Cliente:tcliente;
+arqcliente:file of tcliente;
+begin
+     assignfile(arqcliente,'C:\Cadastrocliente\cadastros.txt');
+     reset(arqcliente);
+     while (not eof(arqcliente)) do
+     begin
+       read(arqcliente,Cliente);
+       Escreverdados(Cliente);
+       end;
+     closefile(arqcliente);
+end;
+
+//ESCREVE OS CADASTROS DO CLIENTE NA TELA
+procedure Escreverdados(Cliente:tcliente);
+begin
+  writeln('Codigo do cliente: ',Cliente.codigo);
+  writeln(' ');
+  writeln('Nome do cliente: ',Cliente.nome);
+  writeln(' ');
+  writeln('Endereco do cliente: ',Cliente.endereço);
+  writeln(' ');
+  writeln('Cidade do cliente: ',Cliente.cidade);
+  writeln(' ');
+  writeln('UF do cliente: ',Cliente.uf);
+  writeln('______________________________________________________________________ ');
+end;
+
+//escreve dados dos produtos
+procedure Escreverdadosp(Produto:tproduto);
+begin
+  writeln('Codigo produto: ',Produto.codigo);
+  writeln(' ');
+  writeln('Descricao do produto: ',Produto.descricao);
+  writeln('');
+  writeln('Preco do produto: ',Produto.valorunit:0:2);
+  writeln('______________________________________________________________________ ');
+
+end;
+
+//CADSATRO DE PRODUTOS(codigo, descrição, valor unitario)
+procedure cadastrarproduto;
+var
+Produto:tproduto;
+begin
+   writeln('Area de cadastro de produtos informe fim para retornar ao menu');
+   writeln('');
+repeat
+   Write('Informe a descricao do produto: ');
+   readln(Produto.descricao);
+until(Produto.descricao<>'');
+if produto.descricao='fim' then
+   begin
+     exit;
+   end;
+repeat
+   Write('Informe o valor do produto: ');
+   readln(Produto.valorunit);
+until (Produto.valorunit>0);
+salvarprodutos(Produto);
+end;
+
+procedure salvarprodutos(Produto:tproduto);
+var
+arqproduto:file of tproduto;
+x:integer;
+begin
+     assignfile(arqproduto,'C:\Cadastroproduto\cadastrosp.txt');
+     {I-}
+     reset(arqproduto);
+     if IORESULT<>0 then
+      Rewrite(arqproduto);
+     {I+}
+     x:=filesize(arqproduto);
+     produto.codigo:=x;
+     seek(arqproduto,x);
+     write(arqproduto,Produto);
+     closefile(arqProduto);
+     writeln('O CODIGO DE ',produto.descricao,' é ',x);
+     cadastrarproduto;
+     end;
+ //PEGA DADOS PARA NOTA
+procedure emitirnota;
+var
+itens:titens;
+valido:boolean;
+codcliente:integer;
+begin
+
+  repeat
+        write('Informe o codigo do cliente ou (-1) para pesquisar todos clientes disponiveis: ');
+        readln(itens.codcliente);
+  until (itens.codcliente>=0) or (itens.codcliente=-1) ;
+  if (itens.codcliente=-1) then
+  begin
+    lercadastrados;
+    emitirnota;
+    exit;
+  end
+  else
+    buscarcadastro(itens.codcliente);
+   repeat
+     writeln('Caso termine de adicionar produtos insira -1 no campo de codigo');
+     write('Informe o codigo do produto: '); //Programa fechando com o codigo 10
+     readln(itens.codproduto);
+     if itens.codproduto=-1 then
+     begin
+      exit;
+     end;
+     valido:=Buscarproduto(itens);
+     if valido=true then
+     begin
+      write('Quantidade: ');
+      readln(itens.quantidade);
+      salvarcadastron(itens);
+     end;
+    until (itens.codproduto=-1);
+
+end;
+//BUSCA CADASTRO POR CODIGO
+procedure buscarcadastro(codcliente:integer);
+var
+arqcliente:file of tcliente;
+Cliente:tcliente;
+begin
+     assignfile(arqcliente,'C:\Cadastrocliente\cadastros.txt');
+     reset(arqcliente);
+     if (codcliente>filesize(arqcliente)) or (codcliente<0) then
+      begin
+        aviso;
+        closefile(arqcliente);
+        emitirnota;
+        exit;
+      end
+     else
+     begin
+      seek(arqcliente,codcliente);
+      read(arqcliente,cliente);
+      escreverdados(Cliente);
+     end;
+    closefile(arqcliente);
+end;
+
+//BUSCA PRODUTO POR CODIGO
+function buscarproduto(itens:titens):boolean;
+var
+arqproduto:file of tproduto;
+Produto:tproduto;
+begin
+     buscarproduto:=true;
+     assignfile(arqproduto,'C:\Cadastroproduto\cadastrosp.txt');
+     reset(arqproduto);
+     if (itens.codproduto>filesize(arqproduto)) or (itens.codproduto<0) then
+       begin
+        buscarproduto:=false;
+        aviso;
+        closefile(arqproduto);
+        exit;
+       end
+     else
+     begin
+      seek(arqproduto,itens.codproduto);
+      read(arqproduto,Produto);
+      escreverdadosp(Produto);
+     end;
+    closefile(arqproduto);
+end;
+
+procedure Salvarcadastron(itens:titens);
+var
+arqitens:file of titens;
+x:integer;
+begin
+     assignfile(arqitens,'C:\Cadastronota\cadastrosn.txt');
+     {I-}
+     reset(arqitens);
+     if IORESULT<>0 then
+      Rewrite(arqitens);
+     {I+}
+     x:=filesize(arqitens);
+     itens.codnota:=filesize(arqitens);
+     seek(arqitens,filesize(arqitens));
+     write(arqitens,itens);
+     closefile(arqitens);
+     writeln('CADASTRO DE NOTA CONCLUIDOS COM SUCESSO CODIGO DA NOTA = ',x);
+end;
+
+
+
+procedure mostrarnota(itens:titens);
+var
+x:integer;
+begin
+  writeln('Codigo da nota: ',itens.codnota);
+  buscarcadastro(itens.codcliente);
+  writeln('Quantidade: ',itens.quantidade,' Valor unitario: ',itens.valor:0:1);
+  writeln('Valor total da nota',itens.quantidade*itens.valor:0:1);
+
+end;
+
+procedure consultarnota(codnota:integer);
+var
+Itens:titens;
+arqitens:file of titens;
+begin
+    Writeln('Informe o codigo da nota');
+    readln(codnota);
+     assignfile(arqitens,'C:\Cadastronota\cadastrosn.txt');
+     reset(arqitens);
+     if (codnota>filesize(arqitens)) or (codnota<0) then
+      begin
+        aviso;
+        closefile(arqitens);
+        exit;
+      end
+     else
+     begin
+      seek(arqitens,codnota);
+      read(arqitens,itens);
+      mostrarnota(Itens);
+     end;
+    closefile(arqitens);
+end;
+
+//Procedimento principal
+begin
+menu;
+end.

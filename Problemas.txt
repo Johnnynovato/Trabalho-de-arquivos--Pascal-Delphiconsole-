@@ -1,0 +1,5 @@
+Cadastro possivel de somente um item;
+Valores reais estao salvando como caracteres esquisitos;
+Arquivos nao estavam sendo criados automaticamente somente manualmente
+
+Johnny Anderson Nascimento Informatica:201
